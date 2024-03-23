@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      table {
+        margin: auto;
+        text-align: center;
+        margin-top: 10vh;
+        font-size: larger;
+      }
+      table,
+      table tr th,
+      table tr td {
+        border: 1px solid black;
+        padding: 3px;
+      }
+    </style>
+    <title>Document</title>
+  </head>
+  <body>
+    <div style="text-align: center">
+      <a href="index.html">SignIn</a>
+      <a href="#">Register</a>
+      <div class="in-data">
+        <table>
+          <caption>
+            <b> Table User</b>
+          </caption>
+          <tr>
+            <th>Name</th>
+            <th>number</th>
+            <th>Address</th>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <script>
+      fetch("http://localhost:5000/api/data")
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          return response.json(); // تحويل البيانات إلى JSON
+        })
+        .then((data) => {
+          console.log(data);
+          createTable(data);
+        })
+        .catch((error) => {
+          console.error("There was a problem with the fetch operation:", error);
+        });
+
+      function createTable(data) {
+        let inData = document.querySelector("table");
+
+        data.forEach((e) => {
+          let tr = document.createElement("tr");
+          tr.className = "tr1";
+
+          let tdName = document.createElement("td");
+          let tdnumber = document.createElement("td");
+          let tdAddress = document.createElement("td");
+          let tdDel = document.createElement("td");
+
+          let but = document.createElement("button");
+          let butEdit = document.createElement("button");
+          but.append(document.createTextNode("Delete"));
+          butEdit.append(document.createTextNode("Edit"));
+          tdDel.append(but);
+          tdDel.append(butEdit);
+
+          tr.appendChild(tdName);
+          tr.appendChild(tdnumber);
+          tr.appendChild(tdAddress);
+          tr.appendChild(tdDel);
+          tr.setAttribute("id", e.id);
+
+          tdName.append(e.name);
+          tdnumber.append(e.number);
+          tdAddress.append(e.address);
+
+          inData.appendChild(tr);
+          let it = e.id;
+          but.onclick = () => {
+            console.log(it);
+            fetch(`http://localhost:5000/api/data/${it}`, {
+              method: "DELETE",
+            })
+              .then((response) => {
+                return response.json();
+              })
+              .then((data) => {
+                console.log("Item deleted:", data);
+                // يمكنك هنا تحديث الواجهة أو القيام بأي إجراءات أخرى بعد الحذف بنجاح
+                location.reload();
+              })
+              .catch((error) => {
+                console.error(
+                  "There was a problem with the fetch operation:",
+                  error
+                );
+              });
+          };
+
+          butEdit.onclick = () => {
+            let inp = tr.children;
+            let text = document.createElement("input");
+
+            let text1 = inp[0].textContent;
+            let text2 = inp[1].textContent;
+            let text3 = inp[2].textContent;
+
+            inp[0].innerHTML = `<input type="text" value='${text1}' />`;
+            inp[1].innerHTML = `<input type="text" value='${text2}' />`;
+            inp[2].innerHTML = `<input type="text" value='${text3}' />`;
+            inp[3].innerHTML = `<button type="submit">update</button>`;
+
+            // الضغط على زر التحديث
+            inp[3].children[0].onclick = (e) => {
+              let id = tr.id;
+              let newData = {
+                id: id,
+                name: inp[0].children[0].value,
+                number: inp[1].children[0].value,
+                address: inp[2].children[0].value,
+              };
+              fetch(`http://localhost:5000/api/data/${newData.id}`, {
+                method: "PUT",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newData),
+              })
+                .then((response) => response.json())
+                .then((data) => location.reload())
+                .catch((error) => {
+                  console.error("Error:", error); // عرض الأخطاء في حال حدوثها
+                });
+            };
+          };
+        });
+      }
+    </script>
+  </body>
+</html>

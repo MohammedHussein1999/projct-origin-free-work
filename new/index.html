@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div style="text-align: center">
+      <a href="#">SignIn</a>
+      <a href="Regster.html">Register</a>
+    </div>
+    <form
+      action=" http://localhost:5000/api/data "
+      method="POST"
+      id="register-data"
+      style="margin: auto; padding: 15px; margin-top: 40vh; text-align: center">
+      <div>
+        <label for=""> الاسم : </label
+        ><input name="name" class="data-user" type="text" />
+      </div>
+      <br />
+      <div>
+        <label for=""> السعر : </label
+        ><input name="number" class="data-user" type="text" />
+      </div>
+      <br />
+      <div>
+        <label for=""> اللون : </label
+        ><input name="address" class="data-user" type="text" />
+      </div>
+      <br />
+      <input type="submit" onclick="{empty()}" />
+    </form>
+    <script>
+      function dataSand(e) {
+        let formUser = document.getElementById("register-data");
+        let bb = document.getElementsByClassName("register-data");
+        // e.target.preventDefault();
+
+        let inputGroup = document.querySelectorAll(".data-user");
+        let inputName = inputGroup[0];
+        let inputnumber = inputGroup[1];
+        let inputAddress = inputGroup[2];
+
+        let user = {
+          name: inputName.value,
+          number: inputnumber.value,
+          address: inputAddress.value,
+        };
+
+        // ارسال البينات عن ----------------------------------------------------------------
+        fetch("http://localhost:5000/api/data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Data sent successfully:", data);
+            window.location.href = "/success";
+          })
+          .catch((error) => {
+            console.error(
+              "There was a problem with the fetch operation:",
+              error
+            );
+          });
+      }
+    </script>
+  </body>
+</html>
